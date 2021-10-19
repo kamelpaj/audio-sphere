@@ -7,8 +7,11 @@ uniform float uSmallWavesElevation;
 uniform float uSmallWavesFrequency;
 uniform float uSmallWavesSpeed;
 uniform float uSmallWavesIterations;
+uniform sampler2D uAudioData;
 
 varying float vElevation;
+varying float vAudioData;
+varying float vTime;
 
 // Classic Perlin 3D Noise 
 // by Stefan Gustavson
@@ -106,23 +109,20 @@ void main()
                     * uBigWavesElevation;
 
 
-    // 
-    // 
-    // 
-    // 
+   float audioData = texture2D( uAudioData, vec2( 0.0, 0.0 ) ).r;
 
     for (float i = 1.0; i <= uSmallWavesIterations; i++)
     {
         elevation -= abs(
             cnoise(
                 vec3(
-                    modelPosition.xz * uSmallWavesFrequency * i, 
+                    modelPosition.xz * (uSmallWavesFrequency) * i, 
                     uTime * uSmallWavesSpeed)) * uSmallWavesElevation / i);
     }
     
     
 
-    modelPosition.y += elevation;
+    modelPosition.y += elevation * (audioData * 1.5);
 
     vec4 viewPosition = viewMatrix * modelPosition;
     vec4 projectedPosition = projectionMatrix * viewPosition;
@@ -131,4 +131,6 @@ void main()
 
     // Varyings
     vElevation = elevation;
+    vAudioData = audioData;
+    vTime = uTime;
 }
